@@ -1,14 +1,10 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext.jsx";
+import { getToken } from "../api/axios.js";
 
 const SocketContext = createContext(null);
 
-// Mirrors the same production gap as api/axios.js: in dev, Vite's proxy
-// forwards /socket.io to the backend on the same origin, so no URL is
-// needed. In production the API is usually a separate origin, so derive
-// the socket server's base URL from VITE_API_URL (stripping the trailing
-// /api) rather than assuming same-origin.
 const SOCKET_URL = import.meta.env.VITE_API_URL
   ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "")
   : undefined;
@@ -28,9 +24,13 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    // withCredentials sends the httpOnly JWT cookie so the server's
-    // socketAuthMiddleware can identify the user.
-    const newSocket = io(SOCKET_URL, { withCredentials: true, transports: ["websocket", "polling"] });
+    // Pass the stored token in handshake.auth so the socket server can
+    // authenticate on mobile where the cookie is blocked by Safari ITP.
+    const newSocket = io(SOCKET_URL, {
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+      auth: { token: getToken() },
+    });
     socketRef.current = newSocket;
     setSocket(newSocket);
 

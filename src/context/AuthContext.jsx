@@ -5,6 +5,7 @@ import {
   logoutRequest,
   getMeRequest,
 } from "../api/auth.js";
+import { clearToken } from "../api/axios.js";
 
 const AuthContext = createContext(null);
 
@@ -40,6 +41,7 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(async () => {
     await logoutRequest();
+    clearToken(); // remove the localStorage fallback token
     setUser(null);
   }, []);
 
