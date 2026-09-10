@@ -32,7 +32,7 @@ export default function Home() {
 
         <div className="aspect-square overflow-hidden rounded-2xl bg-cream ring-1 ring-clay/20">
           <img
-            src="..\assets\handmade.png"
+            src="https://res.cloudinary.com/nm8lyjbu/image/upload/v1789061864/handmade.png"
             alt="Handmade product"
             className="h-full w-full object-cover"
           />
