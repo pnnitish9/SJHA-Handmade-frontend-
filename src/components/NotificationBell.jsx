@@ -6,27 +6,39 @@ import {
   markNotificationReadRequest,
   markAllNotificationsReadRequest,
 } from "../api/notifications.js";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const POLL_INTERVAL_MS = 30000;
 
 export default function NotificationBell() {
+  const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const containerRef = useRef(null);
 
   const load = () => {
-    getMyNotificationsRequest().then(({ data }) => {
-      setNotifications(data.notifications);
-      setUnreadCount(data.unreadCount);
-    });
+    // Never fire if not authenticated — avoids 401 storm on page load
+    if (!isAuthenticated) return;
+    getMyNotificationsRequest()
+      .then(({ data }) => {
+        setNotifications(data.notifications);
+        setUnreadCount(data.unreadCount);
+      })
+      .catch(() => {}); // silently ignore network errors
   };
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      // Clear stale state when the user logs out
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
     load();
     const interval = setInterval(load, POLL_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthenticated]); // re-run when auth state changes
 
   useEffect(() => {
     const handleClickOutside = (e) => {
