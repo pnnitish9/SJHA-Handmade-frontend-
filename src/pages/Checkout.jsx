@@ -10,7 +10,7 @@ import { createOrderRequest } from "../api/orders.js";
 import { verifyPaymentRequest } from "../api/payments.js";
 import AddressForm from "../components/AddressForm.jsx";
 
-const FLAT_SHIPPING_FEE = 50;
+const FLAT_SHIPPING_FEE = 1;
 const FREE_SHIPPING_THRESHOLD = 999;
 
 export default function Checkout() {
