@@ -6,7 +6,7 @@ import { formatPrice } from "../utils/formatPrice.js";
 import { loadRazorpayScript } from "../utils/loadRazorpay.js";
 import { addAddressRequest } from "../api/auth.js";
 import { validateCouponRequest } from "../api/coupons.js";
-import { createOrderRequest } from "../api/orders.js";
+import { createOrderRequest, cancelOrderRequest } from "../api/orders.js";
 import { verifyPaymentRequest } from "../api/payments.js";
 import AddressForm from "../components/AddressForm.jsx";
 
@@ -96,16 +96,19 @@ export default function Checkout() {
         couponCode: coupon?.code,
       });
 
-      await refreshCart();
-
       if (paymentMethod === "cod") {
+        // COD: cart is cleared server-side, just refresh and navigate
+        await refreshCart();
         navigate(`/orders/${data.order._id}`, { replace: true });
         return;
       }
 
-      // Razorpay flow
+      // Razorpay flow — load the SDK before opening the modal
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded || !data.razorpay) {
+        // SDK failed to load — cancel the pending order so it doesn't
+        // pollute the DB, then let the user try again.
+        await cancelOrderRequest(data.order._id).catch(() => {});
         setError("Could not load the payment gateway. Please try again.");
         setPlacing(false);
         return;
@@ -121,6 +124,10 @@ export default function Checkout() {
         prefill: { name: user.name, email: user.email, contact: user.phone || "" },
         theme: { color: "#B85C38" },
         handler: async (response) => {
+          // Payment succeeded in Razorpay — verify the signature on the backend.
+          // On success the backend confirms the order, clears the cart, and
+          // sends the confirmation email.  On failure the order stays in
+          // payment_pending so the customer can retry from the order page.
           try {
             await verifyPaymentRequest({
               razorpay_order_id: response.razorpay_order_id,
@@ -128,21 +135,34 @@ export default function Checkout() {
               razorpay_signature: response.razorpay_signature,
               orderId: data.order._id,
             });
-          } finally {
+            await refreshCart();
+            navigate(`/orders/${data.order._id}`, { replace: true });
+          } catch {
+            // Signature verification failed — navigate to order page where
+            // the customer can see the failed status and retry payment.
             navigate(`/orders/${data.order._id}`, { replace: true });
           }
         },
         modal: {
-          ondismiss: () => {
-            // Order already exists with paymentStatus "pending" — visible in order history
-            navigate(`/orders/${data.order._id}`, { replace: true });
+          ondismiss: async () => {
+            // Customer closed or cancelled the Razorpay popup without paying.
+            // Cancel the pending order so it's cleaned up immediately.
+            // We do this silently — if the cancel call fails for any reason,
+            // the order just stays in payment_pending until the customer
+            // decides what to do from the order page.
+            await cancelOrderRequest(data.order._id).catch(() => {});
+            // Re-enable the Place Order button so the customer can try again
+            setPlacing(false);
+            setError("Payment was cancelled. You can try again below.");
           },
         },
       });
+
       rzp.open();
+      // Don't setPlacing(false) here — the modal is open.
+      // placing stays true until ondismiss or handler fires.
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong placing your order.");
-    } finally {
       setPlacing(false);
     }
   };

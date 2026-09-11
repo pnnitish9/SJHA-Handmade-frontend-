@@ -4,6 +4,7 @@ export const createOrderRequest = (data) => api.post("/orders", data);
 export const getMyOrdersRequest = () => api.get("/orders/mine");
 export const getOrderRequest = (id) => api.get(`/orders/${id}`);
 export const cancelOrderRequest = (id) => api.patch(`/orders/${id}/cancel`);
+export const retryPaymentRequest = (id) => api.get(`/orders/${id}/retry-payment`);
 
 // Admin
 export const getAllOrdersRequest = (params) => api.get("/orders", { params });
