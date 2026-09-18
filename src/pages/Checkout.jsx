@@ -12,7 +12,7 @@ import AddressForm from "../components/AddressForm.jsx";
 const FLAT_SHIPPING_FEE = 50;
 const FREE_SHIPPING_THRESHOLD = 999;
 
-const UPI_ID   = "7258888230-2@ybl";
+const UPI_ID   = "8092297525@ibl";
 const UPI_NAME = "SJHA Handmade";
 
 const STEP_ADDRESS = "address";
@@ -281,7 +281,7 @@ export default function Checkout() {
             <div className="flex w-full justify-center">
               <div className="overflow-hidden rounded-2xl border border-clay/20 bg-white p-3 shadow-sm">
                 <img
-                  src="/upi-qr.png"
+                  src="https://res.cloudinary.com/nm8lyjbu/image/upload/v1789751254/QRCode.jpg"
                   alt="UPI QR Code"
                   className="h-52 w-52 object-contain sm:h-60 sm:w-60"
                   onError={(e) => {
