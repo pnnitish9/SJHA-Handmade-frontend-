@@ -35,6 +35,9 @@ export default function AdminLayout() {
           <NavLink to="/admin/reviews" className={linkClass}>
             Reviews
           </NavLink>
+          <NavLink to="/admin/payments" className={linkClass}>
+            Payments
+          </NavLink>
           <NavLink to="/admin/messages" className={linkClass}>
             Messages
           </NavLink>

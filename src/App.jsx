@@ -29,6 +29,7 @@ import AdminCoupons from "./pages/admin/AdminCoupons.jsx";
 import AdminCustomOrders from "./pages/admin/AdminCustomOrders.jsx";
 import AdminCustomers from "./pages/admin/AdminCustomers.jsx";
 import AdminReviews from "./pages/admin/AdminReviews.jsx";
+import AdminPayments from "./pages/admin/AdminPayments.jsx";
 
 export default function App() {
   return (
@@ -119,6 +120,7 @@ export default function App() {
           <Route path="customers" element={<AdminCustomers />} />
           <Route path="reviews" element={<AdminReviews />} />
           <Route path="messages" element={<AdminMessages />} />
+          <Route path="payments" element={<AdminPayments />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
