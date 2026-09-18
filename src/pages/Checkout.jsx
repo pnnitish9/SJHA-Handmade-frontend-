@@ -58,9 +58,11 @@ export default function Checkout() {
   const [copied, setCopied] = useState(false);
 
   // ── Payment proof form ────────────────────────────────────────────────────
-  const [proof, setProof]             = useState(EMPTY_PROOF);
-  const [proofError, setProofError]   = useState("");
-  const [submitting, setSubmitting]   = useState(false);
+  const [proof, setProof]               = useState(EMPTY_PROOF);
+  const [screenshot, setScreenshot]     = useState(null);     // File object
+  const [screenshotPreview, setScreenshotPreview] = useState(""); // object URL
+  const [proofError, setProofError]     = useState("");
+  const [submitting, setSubmitting]     = useState(false);
 
   // ── Derived totals (for STEP_ADDRESS sidebar display) ─────────────────────
   const subtotal =
@@ -147,6 +149,23 @@ export default function Checkout() {
     setProof((p) => ({ ...p, [name]: value }));
   };
 
+  const handleScreenshotChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      setProofError("Please upload a JPG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setProofError("Screenshot must be under 5 MB.");
+      return;
+    }
+    setProofError("");
+    setScreenshot(file);
+    setScreenshotPreview(URL.createObjectURL(file));
+  };
+
   // Submit payment details → backend creates payment record, order → payment_verification
   const handleSubmitProof = async (e) => {
     e.preventDefault();
@@ -159,10 +178,14 @@ export default function Checkout() {
       setProofError("Please fill in all required fields.");
       return;
     }
+    if (!screenshot) {
+      setProofError("Please upload a screenshot of your payment.");
+      return;
+    }
 
     const formData = new FormData();
-    // Append all proof fields — no screenshot required
     Object.entries(proof).forEach(([k, v]) => formData.append(k, v));
+    formData.append("screenshot", screenshot);
 
     setSubmitting(true);
     try {
@@ -422,6 +445,47 @@ export default function Checkout() {
                   required
                   className="mt-1.5 w-full rounded-xl border border-clay/30 bg-oat px-4 py-2.5 text-sm focus:border-thread focus:outline-none"
                 />
+              </div>
+
+              {/* Payment screenshot */}
+              <div>
+                <label className="block text-sm font-medium text-ink">
+                  Payment Screenshot <span className="text-red-500">*</span>
+                </label>
+                <p className="mt-0.5 text-xs text-clay">
+                  Upload a screenshot from your UPI app showing the successful payment.
+                </p>
+                <label className="mt-2 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-clay/30 bg-oat px-4 py-5 text-center transition hover:border-thread">
+                  {screenshotPreview ? (
+                    <img
+                      src={screenshotPreview}
+                      alt="Payment screenshot preview"
+                      className="max-h-40 w-full rounded-lg object-contain"
+                    />
+                  ) : (
+                    <>
+                      <svg className="h-8 w-8 text-clay/50" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5V19a1.5 1.5 0 001.5 1.5h15A1.5 1.5 0 0021 19v-2.5M16.5 12L12 7.5m0 0L7.5 12M12 7.5V19" />
+                      </svg>
+                      <span className="text-xs text-clay">Click to upload (JPG, PNG, WebP · max 5 MB)</span>
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleScreenshotChange}
+                    className="sr-only"
+                  />
+                </label>
+                {screenshotPreview && (
+                  <button
+                    type="button"
+                    onClick={() => { setScreenshot(null); setScreenshotPreview(""); }}
+                    className="mt-1 text-xs text-clay hover:text-red-500"
+                  >
+                    Remove screenshot
+                  </button>
+                )}
               </div>
             </div>
 
