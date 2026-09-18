@@ -363,17 +363,11 @@ export default function CustomOrders() {
                           <p className="mb-3 text-center text-sm font-medium text-ink">Scan & Pay</p>
                           <div className="flex flex-col items-center gap-3">
                             <p className="font-display text-3xl text-ink">{formatPrice(order.total)}</p>
-                            {qrUrls[req._id] ? (
-                                <img
-                                  src="https://res.cloudinary.com/nm8lyjbu/image/upload/v1789751254/QRCode.jpg"
-                                  alt="UPI QR"
-                                  className="h-44 w-44 rounded-xl border border-clay/20 p-1.5"
-                                />
-                              ) : (
-                                <div className="flex h-44 w-44 items-center justify-center rounded-xl border border-clay/20">
-                                  <p className="text-xs text-clay">Generating…</p>
-                                </div>
-                              )}
+                            <img
+                              src="https://res.cloudinary.com/nm8lyjbu/image/upload/v1789751254/QRCode.jpg"
+                              alt="UPI QR"
+                              className="h-44 w-44 rounded-xl border border-clay/20 p-1.5"
+                            />
                             <div className="w-full rounded-lg bg-oat px-3 py-2.5">
                               <p className="text-xs text-clay">UPI ID</p>
                               <div className="mt-0.5 flex items-center justify-between gap-2">
