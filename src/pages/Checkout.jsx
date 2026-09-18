@@ -23,6 +23,7 @@ const UPI_MODES = ["PhonePe", "Google Pay", "Paytm", "BHIM", "Other"];
 
 const EMPTY_PROOF = {
   payerName:     "",
+  payerPhone:    "",
   transactionId: "",
   paymentDate:   "",
   paymentTime:   "",
@@ -172,7 +173,7 @@ export default function Checkout() {
     setProofError("");
 
     // Client-side required check
-    const required = ["payerName", "transactionId", "paymentDate", "paymentTime", "upiMode", "bankName"];
+    const required = ["payerName", "payerPhone", "transactionId", "paymentDate", "paymentTime", "upiMode", "bankName"];
     const missing  = required.filter((k) => !proof[k]?.trim());
     if (missing.length) {
       setProofError("Please fill in all required fields.");
@@ -363,6 +364,25 @@ export default function Checkout() {
                   required
                   className="mt-1.5 w-full rounded-xl border border-clay/30 bg-oat px-4 py-2.5 text-sm focus:border-thread focus:outline-none"
                 />
+              </div>
+
+              {/* Phone number */}
+              <div>
+                <label className="block text-sm font-medium text-ink">
+                  UPI Phone Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  name="payerPhone"
+                  type="tel"
+                  value={proof.payerPhone}
+                  onChange={handleProofChange}
+                  placeholder="Phone number linked to your UPI"
+                  required
+                  className="mt-1.5 w-full rounded-xl border border-clay/30 bg-oat px-4 py-2.5 text-sm focus:border-thread focus:outline-none"
+                />
+                <p className="mt-1 text-xs text-clay">
+                  Required for refunds if the order is cancelled.
+                </p>
               </div>
 
               {/* UTR */}
