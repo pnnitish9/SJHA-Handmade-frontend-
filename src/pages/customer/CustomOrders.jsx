@@ -364,14 +364,18 @@ export default function CustomOrders() {
                           <div className="flex flex-col items-center gap-3">
                             <p className="font-display text-3xl text-ink">{formatPrice(order.total)}</p>
                             {qrUrls[req._id] ? (
-                              <img src={qrUrls[req._id]} alt="UPI QR" className="h-44 w-44 rounded-xl border border-clay/20 p-1.5" />
+                              <img
+                                src="https://res.cloudinary.com/nm8lyjbu/image/upload/v1789751254/QRCode.jpg"
+                                alt="UPI QR"
+                                className="h-44 w-44 rounded-xl border border-clay/20 p-1.5"
+                              />
                             ) : (
                               <div className="flex h-44 w-44 items-center justify-center rounded-xl border border-clay/20"><p className="text-xs text-clay">Generating…</p></div>
                             )}
                             <div className="w-full rounded-lg bg-oat px-3 py-2.5">
                               <p className="text-xs text-clay">UPI ID</p>
                               <div className="mt-0.5 flex items-center justify-between gap-2">
-                                <span className="break-all text-sm font-medium text-ink">{upiConfig.upiId || "—"}</span>
+                                <span className="break-all text-sm font-medium text-ink">{upiConfig.upiId || "8092297525@ibl"}</span>
                                 <button onClick={handleCopyUpi} className="shrink-0 rounded-lg border border-clay/30 px-2.5 py-1 text-xs text-ink hover:border-thread">
                                   {copied ? <span className="flex items-center gap-1 text-moss"><Check size={11} /> Copied</span> : <span className="flex items-center gap-1"><Copy size={11} /> Copy</span>}
                                 </button>
